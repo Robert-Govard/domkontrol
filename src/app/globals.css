@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Один акцент: electric violet → blue */
+  --color-brand-50: #f3f1ff;
+  --color-brand-100: #e9e5ff;
+  --color-brand-200: #d4ccff;
+  --color-brand-300: #b3a4ff;
+  --color-brand-400: #8f78ff;
+  --color-brand-500: #6d4dff;
+  --color-brand-600: #5b3df5;
+  --color-brand-700: #4b2ed8;
+  --color-brand-800: #3d27ad;
+  --color-brand-900: #2f2185;
+
+  /* Монохромная база */
+  --color-ink: #0b0b12;
+  --color-ink-2: #3a3a48;
+  --color-muted: #8a8a99;
+  --color-line: #ececf1;
+  --color-surface: #f7f7f9;
+  --color-canvas: #ffffff;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-surface text-ink antialiased;
+  font-feature-settings: "ss01", "cv11";
+}
+
+::selection {
+  background: var(--color-brand-200);
+}
+
+@utility bg-brand-gradient {
+  background-image: linear-gradient(120deg, #6d4dff 0%, #4a5dff 50%, #2f86ff 100%);
+}
+
+@utility text-brand-gradient {
+  background-image: linear-gradient(120deg, #6d4dff 0%, #2f86ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Карточка: волосяная граница вместо тяжёлой тени */
+@utility card {
+  @apply rounded-3xl border border-line bg-canvas;
+}
+
+@utility card-dark {
+  @apply rounded-3xl bg-ink text-white;
+}
+
+@utility eyebrow {
+  @apply text-[11px] font-medium tracking-[0.14em] text-muted uppercase;
+}
+
+@utility bg-dots {
+  background-image: radial-gradient(rgb(11 11 18 / 0.07) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(11 11 18 / 0.15) transparent;
+}
+
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility animate-bubble {
+  animation: bubble-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@utility animate-fade-up {
+  animation: fade-up 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

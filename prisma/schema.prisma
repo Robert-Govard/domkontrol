@@ -1,0 +1,91 @@
+// ДомКонтроль — модель данных.
+// Статусы, категории и приоритеты хранятся строками (SQLite),
+// допустимые значения валидируются в src/lib/domain.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  maxUserId String   @unique
+  name      String
+  createdAt DateTime @default(now())
+
+  tickets Ticket[]
+  session BotSession?
+}
+
+model Building {
+  id        String @id @default(cuid())
+  city      String
+  street    String
+  house     String
+  entrances Int    @default(4)
+
+  tickets Ticket[]
+}
+
+model Ticket {
+  id           String   @id @default(cuid())
+  ticketNumber Int      @unique
+  userId       String
+  buildingId   String
+  entrance     Int
+  category     String
+  description  String
+  photoUrl     String?
+  status       String   @default("NEW")
+  priority     String   @default("MEDIUM")
+  priorityReason String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user     User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  building Building              @relation(fields: [buildingId], references: [id])
+  history  TicketStatusHistory[]
+
+  @@index([status])
+  @@index([userId])
+}
+
+model TicketStatusHistory {
+  id        String   @id @default(cuid())
+  ticketId  String
+  oldStatus String?
+  newStatus String
+  createdAt DateTime @default(now())
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+}
+
+/// Состояние диалога с ботом (пошаговое создание заявки).
+model BotSession {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  state     String   @default("IDLE")
+  draft     String   @default("{}")
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// Лента сообщений демо-чата (MockMaxAdapter). В реальном MAX не используется.
+model ChatMessage {
+  id        Int      @id @default(autoincrement())
+  maxUserId String
+  direction String // "in" — от жителя, "out" — от бота
+  text      String
+  buttons   String? // JSON: Button[][]
+  imageUrl  String?
+  createdAt DateTime @default(now())
+
+  @@index([maxUserId, id])
+}
