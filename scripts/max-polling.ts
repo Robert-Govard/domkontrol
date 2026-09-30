@@ -28,7 +28,9 @@ async function main() {
         await handleIncomingEvent(event, adapter).catch((e) => console.error("[bot]", e));
       }
     } catch (e) {
-      console.error("[polling]", e instanceof Error ? e.message : e);
+      // fetch прячет реальную причину (DNS, сертификат и т. п.) в e.cause
+      const cause = e instanceof Error && e.cause instanceof Error ? ` (${e.cause.message})` : "";
+      console.error("[polling]", e instanceof Error ? e.message + cause : e);
       await new Promise((r) => setTimeout(r, 3000));
     }
   }

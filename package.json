@@ -5,17 +5,17 @@
   "description": "ДомКонтроль — заявки жителей в управляющую компанию через MAX",
   "scripts": {
     "setup": "npm install && npm run db:reset",
-    "dev": "next dev",
+    "dev": "cross-env NODE_EXTRA_CA_CERTS=./certs/russian_trusted_root_ca.pem next dev",
     "build": "prisma generate && next build",
-    "start": "next start",
+    "start": "cross-env NODE_EXTRA_CA_CERTS=./certs/russian_trusted_root_ca.pem next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
     "db:reset": "prisma db push --force-reset && prisma db seed",
     "db:studio": "prisma studio",
-    "max:webhook": "tsx scripts/max-webhook.ts",
-    "max:polling": "tsx scripts/max-polling.ts"
+    "max:webhook": "cross-env NODE_EXTRA_CA_CERTS=./certs/russian_trusted_root_ca.pem tsx scripts/max-webhook.ts",
+    "max:polling": "cross-env NODE_EXTRA_CA_CERTS=./certs/russian_trusted_root_ca.pem tsx scripts/max-polling.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -35,6 +35,7 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "dotenv": "^16.4.7",
     "eslint": "^9",
     "eslint-config-next": "15.5.26",

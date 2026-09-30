@@ -271,6 +271,8 @@ node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"
 
 После изменения `.env` перезапустите сервер.
 
+> 🔐 **Сертификат Минцифры.** Сервер MAX API использует сертификат российского национального удостоверяющего центра (**Russian Trusted Root CA**), которому Node.js по умолчанию не доверяет. Корневой сертификат уже лежит в проекте (`certs/russian_trusted_root_ca.pem`, [официальный источник — Госуслуги](https://www.gosuslugi.ru/crt)), а команды `npm run dev`, `npm start` и `npm run max:*` подключают его автоматически через `NODE_EXTRA_CA_CERTS`. Системное хранилище сертификатов при этом не меняется, ничего настраивать не нужно.
+
 ### 10.3а. Локальная разработка: long polling
 
 Публичный адрес не нужен. В **отдельном** окне терминала (рядом с `npm run dev`) запустите:
@@ -460,6 +462,21 @@ npx prisma generate
 - Для long polling: проверьте, что `npm run max:polling` запущен и в его окне появляются строки `← start от …`.
 - Для вебхука: проверьте, что `PUBLIC_URL` открывается из интернета по HTTPS, и повторите `npm run max:webhook`.
 - Если заданы и вебхук, и polling, работает только вебхук.
+</details>
+
+<details>
+<summary><b><code>[polling] fetch failed (unable to get local issuer certificate)</code></b></summary>
+
+Node.js не доверяет сертификату MAX API, выданному Russian Trusted Root CA (Минцифры).
+
+- Запускайте через `npm run …`, а не напрямую `npx next start` или `npx tsx …`: npm-скрипты подключают `certs/russian_trusted_root_ca.pem`.
+- Проверьте, что файл `certs/russian_trusted_root_ca.pem` на месте. Если он пропал, скачайте его заново:
+
+  ```bash
+  curl -o certs/russian_trusted_root_ca.pem https://gu-st.ru/content/lending/russian_trusted_root_ca_pem.crt
+  ```
+
+- Отключать проверку сертификатов (`NODE_TLS_REJECT_UNAUTHORIZED=0`) **не нужно и небезопасно**.
 </details>
 
 <details>
