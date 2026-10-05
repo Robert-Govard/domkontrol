@@ -28,6 +28,8 @@ async function main() {
         await handleIncomingEvent(event, adapter).catch((e) => console.error("[bot]", e));
       }
     } catch (e) {
+      // Обрыв долгого ожидания — штатная ситуация: просто переподключаемся.
+      if (e instanceof Error && e.name === "TimeoutError") continue;
       // fetch прячет реальную причину (DNS, сертификат и т. п.) в e.cause
       const cause = e instanceof Error && e.cause instanceof Error ? ` (${e.cause.message})` : "";
       console.error("[polling]", e instanceof Error ? e.message + cause : e);

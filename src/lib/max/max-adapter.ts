@@ -49,7 +49,9 @@ export class MaxAdapter implements MessengerAdapter {
     const params = new URLSearchParams({ timeout: String(timeoutSec), limit: "100" });
     params.set("types", "message_created,message_callback,bot_started");
     if (marker !== undefined) params.set("marker", String(marker));
-    return (await this.request("GET", `/updates?${params}`)) as { updates: unknown[]; marker?: number };
+    // Сервер держит соединение до timeoutSec, плюс запас на сеть.
+    const res = await this.request("GET", `/updates?${params}`, undefined, (timeoutSec + 60) * 1000);
+    return res as { updates: unknown[]; marker?: number };
   }
 
   private toBody(message: OutgoingMessage): MaxNewMessageBody {
@@ -71,7 +73,7 @@ export class MaxAdapter implements MessengerAdapter {
     return { text: message.text, ...(attachments.length ? { attachments } : {}) };
   }
 
-  private async request(method: "GET" | "POST", path: string, body?: unknown): Promise<unknown> {
+  private async request(method: "GET" | "POST", path: string, body?: unknown, timeoutMs = 10_000): Promise<unknown> {
     const res = await fetch(`${this.baseUrl}${path}`, {
       method,
       headers: {
@@ -79,7 +81,7 @@ export class MaxAdapter implements MessengerAdapter {
         ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,
-      signal: AbortSignal.timeout(method === "GET" ? 45_000 : 10_000),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     const text = await res.text();
     if (!res.ok) {
